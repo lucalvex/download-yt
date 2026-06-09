@@ -2,32 +2,32 @@ import xml.etree.ElementTree as ET
 import subprocess
 from pathlib import Path
 
-PASTA_XML = "xmls"
-PASTA_VIDEOS = "videos"
+XML_FOLDER = "xmls"
+VIDEOS_FOLDER = "videos"
 
-# Cria a pasta de saída se não existir
-Path(PASTA_VIDEOS).mkdir(exist_ok=True)
+# Create the output directory if it does not exist
+Path(VIDEOS_FOLDER).mkdir(exist_ok=True)
 
-for arquivo_xml in Path(PASTA_XML).glob("*.xml"):
+for xml_file in Path(XML_FOLDER).glob("*.xml"):
   try:
-    tree = ET.parse(arquivo_xml)
+    tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    # Obtém o id do vídeo
-    video_id = root.attrib.get("id", arquivo_xml.stem)
+    # Get the video ID
+    video_id = root.attrib.get("id", xml_file.stem)
 
-    # Obtém a URL
+    # Get the video URL
     url = root.find("url")
 
     if url is not None and url.text:
-      print(f"Baixando {video_id}: {url.text}")
+      print(f"Downloading {video_id}: {url.text}")
 
       subprocess.run([
         "yt-dlp",
         "-o",
-        f"{PASTA_VIDEOS}/{video_id}.%(ext)s",
+        f"{VIDEOS_FOLDER}/{video_id}.%(ext)s",
         url.text
       ])
 
   except Exception as e:
-    print(f"Erro em {arquivo_xml}: {e}")
+    print(f"Error processing {xml_file}: {e}")
